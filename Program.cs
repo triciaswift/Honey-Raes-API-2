@@ -1,3 +1,34 @@
+// imports all of the names of HoneyRaesAPI.Models
+using HoneyRaesAPI.Models;
+using HoneyRaesAPI.Models.DTOs;
+
+// importing the fully-qualified namespace of program data models; prior to the "using" directive, above
+// List<HoneyRaesAPI.Models.Customer> customers = new List<HoneyRaesAPI.Models.Customer> {};
+// List<HoneyRaesAPI.Models.Employee> employees = new List<HoneyRaesAPI.Models.Employee> {};
+// List<HoneyRaesAPI.Models.ServiceTickets> serviceTickets = new List<HoneyRaesAPI.Models.ServiceTickets> {};
+
+
+List<Customer> customers = new List<Customer>
+{ 
+    new Customer () {Id = 1, Name = "Robert", Address = "123 Street St"},
+    new Customer () {Id = 2, Name = "Marley", Address = "321 Street St"},
+    new Customer () {Id = 3, Name = "Richard", Address = "456 Street St"}
+};
+List<Employee> employees = new List<Employee>
+{
+    new Employee () {Id = 1, Name = "George", Specialty = "777 Street St"},
+    new Employee () {Id = 2, Name = "Ronald", Specialty = "888 Street St"},
+};
+List<ServiceTicket> serviceTickets = new List<ServiceTicket>
+{
+    new ServiceTicket () {Id = 1, CustomerId = 1, EmployeeId = 1, Description = "dirty laundry", Emergency = true, DateCompleted = new DateTime(2023, 8, 10)},
+    new ServiceTicket () {Id = 2, CustomerId = 2, Description = "cat litter", Emergency = true},
+    new ServiceTicket () {Id = 3, CustomerId = 3, EmployeeId = 1, Description = "need to get rid of a dead body", Emergency = false, DateCompleted = new DateTime(2023, 7, 29)},
+    new ServiceTicket () {Id = 4, CustomerId = 1, EmployeeId = 2, Description = "worrying and foreboding machinations", Emergency = false},
+    new ServiceTicket () {Id = 5, CustomerId = 2, Description = "drive me to school", Emergency = true},
+};
+
+//! All of the code is setting up the application to be ready to serve as a web API
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -16,29 +47,94 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+// endpoints
 
-app.MapGet("/weatherforecast", () =>
+// GET - retrieves all service tickets & their properties
+app.MapGet("/servicetickets", () =>
 {
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
+    return serviceTickets.Select(t => new ServiceTicketDTO
+    {
+        Id = t.Id,
+        CustomerId = t.CustomerId,
+        EmployeeId = t.EmployeeId,
+        Description = t.Description,
+        Emergency = t.Emergency,
+        DateCompleted = t.DateCompleted
+    });
+});
 
+// GET - retrieves service ticket by {id} - route parameter
+app.MapGet("/servicetickets/{id}", (int id) =>
+{
+    ServiceTicket serviceTicket = serviceTickets.FirstOrDefault(st => st.Id == id);
+    if (serviceTicket == null)
+    {
+        return Results.NotFound();
+    }
+    return Results.Ok(new ServiceTicketDTO
+    {
+        Id = serviceTicket.Id,
+        CustomerId = serviceTicket.CustomerId,
+        EmployeeId = serviceTicket.EmployeeId,
+        Description = serviceTicket.Description,
+        Emergency = serviceTicket.Emergency,
+        DateCompleted = serviceTicket.DateCompleted
+    });
+});
+
+// GET - retrieves all customers
+app.MapGet("/customers", () =>
+{
+    return customers.Select(c => new CustomerDTO
+    {
+        Id = c.Id,
+        Name = c.Name,
+        Address = c.Address
+    });
+});
+
+// GET - retrieves customer by id
+app.MapGet("/customers/{id}", (int id) =>
+{
+    Customer customer = customers.FirstOrDefault(c => c.Id == id);
+    if (customer == null)
+    {
+        return Results.NotFound();
+    }
+    return Results.Ok(new CustomerDTO
+    {
+        Id = customer.Id,
+        Name = customer.Name,
+        Address = customer.Address
+    });
+});
+
+// GET - retrieves all employees
+app.MapGet("/employees", () =>
+{
+    return employees.Select(e => new EmployeeDTO
+    {
+        Id = e.Id,
+        Name = e.Name,
+        Specialty = e.Specialty
+    });
+});
+
+// GET - retrieves employee by id
+app.MapGet("/employees/{id}", (int id) =>
+{
+    Employee employee = employees.FirstOrDefault(e => e.Id == id);
+    if (employee == null)
+    {
+        return Results.NotFound();
+    }
+    return Results.Ok(new EmployeeDTO
+    {
+        Id = employee.Id,
+        Name = employee.Name,
+        Specialty = employee.Specialty
+    });
+});
+
+//! This starts the app, and should always be at the bottom of this file.
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
