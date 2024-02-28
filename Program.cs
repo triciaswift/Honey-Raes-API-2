@@ -207,5 +207,19 @@ app.MapPost("/servicetickets", (ServiceTicket serviceTicket) =>
     });
 });
 
+// Deletes a service ticket
+app.MapDelete("/servicetickets/{id}", (int id) =>
+{
+    ServiceTicket serviceTicket = serviceTickets.FirstOrDefault(st => st.Id == id);
+
+    if (serviceTicket == null)
+    {
+        return Results.NotFound();
+    }
+
+    serviceTickets.RemoveAt(id - 1);
+    return Results.NoContent();
+});
+
 //! This starts the app, and should always be at the bottom of this file.
 app.Run();
