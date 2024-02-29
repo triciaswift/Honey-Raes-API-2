@@ -244,5 +244,12 @@ app.MapPut("/servicetickets/{id}", (int id, ServiceTicket serviceTicket) =>
     return Results.NoContent();
 });
 
+app.MapPost("/servicetickets/{id}/complete", (int id) =>
+{
+    ServiceTicket ticketToComplete = serviceTickets.FirstOrDefault(st => st.Id == id);
+
+    ticketToComplete.DateCompleted = DateTime.Today;
+});
+
 //! This starts the app, and should always be at the bottom of this file.
 app.Run();
