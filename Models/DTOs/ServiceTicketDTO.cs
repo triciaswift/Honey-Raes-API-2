@@ -8,6 +8,6 @@ public class ServiceTicketDTO
     public string Description { get; set;}
     public bool Emergency { get; set;}
     public DateTime? DateCompleted { get; set;}
-    public EmployeeDTO Employee { get; set; }
-    public CustomerDTO Customer { get; set; }
+    public EmployeeDTO? Employee { get; set; }
+    public CustomerDTO? Customer { get; set; }
 }

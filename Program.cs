@@ -49,57 +49,6 @@ app.UseHttpsRedirection();
 
 // endpoints
 
-// GET - retrieves all service tickets & their properties
-app.MapGet("/servicetickets", () =>
-{
-    return serviceTickets.Select(t => new ServiceTicketDTO
-    {
-        Id = t.Id,
-        CustomerId = t.CustomerId,
-        EmployeeId = t.EmployeeId,
-        Description = t.Description,
-        Emergency = t.Emergency,
-        DateCompleted = t.DateCompleted
-    });
-});
-
-// GET - retrieves service ticket by {id} - route parameter
-app.MapGet("/servicetickets/{id}", (int id) =>
-{
-    ServiceTicket serviceTicket = serviceTickets.FirstOrDefault(st => st.Id == id);
-    
-    if (serviceTicket == null)
-    {
-        return Results.NotFound();
-    }
-    
-    Employee employee = employees.FirstOrDefault(e => e.Id == serviceTicket.EmployeeId);
-
-    Customer customer = customers.FirstOrDefault(e => e.Id == serviceTicket.CustomerId);
-    
-    return Results.Ok(new ServiceTicketDTO
-    {
-        Id = serviceTicket.Id,
-        CustomerId = serviceTicket.CustomerId,
-        EmployeeId = serviceTicket.EmployeeId,
-        Employee = employee == null ? null : new EmployeeDTO
-        {
-            Id = employee.Id,
-            Name = employee.Name,
-            Specialty = employee.Specialty
-        },
-        Customer = customer == null ? null : new CustomerDTO
-        {
-            Id = customer.Id,
-            Name = customer.Name,
-            Address = customer.Address
-        },
-        Description = serviceTicket.Description,
-        Emergency = serviceTicket.Emergency,
-        DateCompleted = serviceTicket.DateCompleted
-    });
-});
-
 // GET - retrieves all customers
 app.MapGet("/customers", () =>
 {
@@ -175,6 +124,57 @@ app.MapGet("/employees/{id}", (int id) =>
     });
 });
 
+// GET - retrieves all service tickets & their properties
+app.MapGet("/servicetickets", () =>
+{
+    return serviceTickets.Select(t => new ServiceTicketDTO
+    {
+        Id = t.Id,
+        CustomerId = t.CustomerId,
+        EmployeeId = t.EmployeeId,
+        Description = t.Description,
+        Emergency = t.Emergency,
+        DateCompleted = t.DateCompleted
+    });
+});
+
+// GET - retrieves service ticket by {id} - route parameter
+app.MapGet("/servicetickets/{id}", (int id) =>
+{
+    ServiceTicket serviceTicket = serviceTickets.FirstOrDefault(st => st.Id == id);
+    
+    if (serviceTicket == null)
+    {
+        return Results.NotFound();
+    }
+    
+    Employee employee = employees.FirstOrDefault(e => e.Id == serviceTicket.EmployeeId);
+
+    Customer customer = customers.FirstOrDefault(e => e.Id == serviceTicket.CustomerId);
+    
+    return Results.Ok(new ServiceTicketDTO
+    {
+        Id = serviceTicket.Id,
+        CustomerId = serviceTicket.CustomerId,
+        EmployeeId = serviceTicket.EmployeeId,
+        Employee = employee == null ? null : new EmployeeDTO
+        {
+            Id = employee.Id,
+            Name = employee.Name,
+            Specialty = employee.Specialty
+        },
+        Customer = customer == null ? null : new CustomerDTO
+        {
+            Id = customer.Id,
+            Name = customer.Name,
+            Address = customer.Address
+        },
+        Description = serviceTicket.Description,
+        Emergency = serviceTicket.Emergency,
+        DateCompleted = serviceTicket.DateCompleted
+    });
+});
+
 // Creates a service ticket -- POST
 app.MapPost("/servicetickets", (ServiceTicket serviceTicket) =>
 {
@@ -218,6 +218,29 @@ app.MapDelete("/servicetickets/{id}", (int id) =>
     }
 
     serviceTickets.RemoveAt(id - 1);
+    return Results.NoContent();
+});
+
+// Updates a service ticket
+app.MapPut("/servicetickets/{id}", (int id, ServiceTicket serviceTicket) =>
+{
+    ServiceTicket ticketToUpdate = serviceTickets.FirstOrDefault(st => st.Id == id);
+
+    if (ticketToUpdate == null)
+    {
+        return Results.NotFound();
+    }
+    if (id != serviceTicket.Id)
+    {
+        return Results.BadRequest();
+    }
+
+    ticketToUpdate.CustomerId = serviceTicket.CustomerId;
+    ticketToUpdate.EmployeeId = serviceTicket.EmployeeId;
+    ticketToUpdate.Description = serviceTicket.Description;
+    ticketToUpdate.Emergency = serviceTicket.Emergency;
+    ticketToUpdate.DateCompleted = serviceTicket.DateCompleted;
+
     return Results.NoContent();
 });
 
