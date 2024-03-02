@@ -63,7 +63,7 @@ app.MapGet("/customers", () =>
 // GET - retrieves customer by id
 app.MapGet("/customers/{id}", (int id) =>
 {
-    Customer customer = customers.FirstOrDefault(c => c.Id == id);
+    Customer? customer = customers.FirstOrDefault(c => c.Id == id);
     if (customer == null)
     {
         return Results.NotFound();
@@ -101,7 +101,7 @@ app.MapGet("/employees", () =>
 // GET - retrieves employee by id
 app.MapGet("/employees/{id}", (int id) =>
 {
-    Employee employee = employees.FirstOrDefault(e => e.Id == id);
+    Employee? employee = employees.FirstOrDefault(e => e.Id == id);
     if (employee == null)
     {
         return Results.NotFound();
@@ -141,16 +141,16 @@ app.MapGet("/servicetickets", () =>
 // GET - retrieves service ticket by {id} - route parameter
 app.MapGet("/servicetickets/{id}", (int id) =>
 {
-    ServiceTicket serviceTicket = serviceTickets.FirstOrDefault(st => st.Id == id);
+    ServiceTicket? serviceTicket = serviceTickets.FirstOrDefault(st => st.Id == id);
     
     if (serviceTicket == null)
     {
         return Results.NotFound();
     }
     
-    Employee employee = employees.FirstOrDefault(e => e.Id == serviceTicket.EmployeeId);
+    Employee? employee = employees.FirstOrDefault(e => e.Id == serviceTicket.EmployeeId);
 
-    Customer customer = customers.FirstOrDefault(e => e.Id == serviceTicket.CustomerId);
+    Customer? customer = customers.FirstOrDefault(e => e.Id == serviceTicket.CustomerId);
     
     return Results.Ok(new ServiceTicketDTO
     {
@@ -178,8 +178,8 @@ app.MapGet("/servicetickets/{id}", (int id) =>
 // Creates a service ticket -- POST
 app.MapPost("/servicetickets", (ServiceTicket serviceTicket) =>
 {
-    // Get the customer data to check that the customerid for the service ticket is valid
-    Customer customer = customers.FirstOrDefault(c => c.Id == serviceTicket.CustomerId);
+    // Get the customer data to check that the customerId for the service ticket is valid
+    Customer? customer = customers.FirstOrDefault(c => c.Id == serviceTicket.CustomerId);
 
     // if the client did not provide a valid customer id, this is a bad request
     if (customer == null)
@@ -210,7 +210,7 @@ app.MapPost("/servicetickets", (ServiceTicket serviceTicket) =>
 // Deletes a service ticket
 app.MapDelete("/servicetickets/{id}", (int id) =>
 {
-    ServiceTicket serviceTicket = serviceTickets.FirstOrDefault(st => st.Id == id);
+    ServiceTicket? serviceTicket = serviceTickets.FirstOrDefault(st => st.Id == id);
 
     if (serviceTicket == null)
     {
@@ -224,7 +224,7 @@ app.MapDelete("/servicetickets/{id}", (int id) =>
 // Updates a service ticket
 app.MapPut("/servicetickets/{id}", (int id, ServiceTicket serviceTicket) =>
 {
-    ServiceTicket ticketToUpdate = serviceTickets.FirstOrDefault(st => st.Id == id);
+    ServiceTicket? ticketToUpdate = serviceTickets.FirstOrDefault(st => st.Id == id);
 
     if (ticketToUpdate == null)
     {
@@ -246,7 +246,7 @@ app.MapPut("/servicetickets/{id}", (int id, ServiceTicket serviceTicket) =>
 
 app.MapPost("/servicetickets/{id}/complete", (int id) =>
 {
-    ServiceTicket ticketToComplete = serviceTickets.FirstOrDefault(st => st.Id == id);
+    ServiceTicket? ticketToComplete = serviceTickets.FirstOrDefault(st => st.Id == id);
 
     ticketToComplete.DateCompleted = DateTime.Today;
 });
